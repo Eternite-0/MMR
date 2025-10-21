@@ -105,8 +105,13 @@ class MMR_pipeline_:
         ima_name_list = []
 
         with torch.no_grad():
-            for image in test_dataloader:
+            # Add progress information
+            LOGGER.info(f"Starting evaluation on {len(test_dataloader)} batches...")
+            for batch_idx, image in enumerate(test_dataloader):
+                LOGGER.info(f"Processing batch {batch_idx}/{len(test_dataloader)}")
+                
                 if isinstance(image, dict):
+                    LOGGER.debug("Extracting data from batch")
                     label_current = image["is_anomaly"].numpy()
                     mask_current = image["mask"].squeeze(1).numpy()
                     labels_gt.extend(label_current.tolist())
@@ -116,31 +121,41 @@ class MMR_pipeline_:
                     ima_name_list.extend(image["image_name"])
 
                     image = image["image"].to(self.device)
+                    LOGGER.debug(f"Image moved to device: {self.device}")
                 else:
                     raise Exception("the format of DATA error!")
 
                 self.teacher_outputs_dict.clear()
+                LOGGER.debug("Running forward pass on cur_model")
                 with torch.no_grad():
                     _ = self.cur_model(image)
+                LOGGER.debug("Extracting multi-scale features")
                 multi_scale_features = [self.teacher_outputs_dict[key]
                                         for key in self.cfg.TRAIN.MMR.layers_to_extract_from]
 
+                LOGGER.debug("Running forward pass on mmr_model")
                 reverse_features = self.mmr_model(image,
                                                   mask_ratio=self.cfg.TRAIN.MMR.test_mask_ratio)
+                LOGGER.debug("Extracting multi-scale reverse features")
                 multi_scale_reverse_features = [reverse_features[key]
                                                 for key in self.cfg.TRAIN.MMR.layers_to_extract_from]
 
+                LOGGER.debug("Calculating anomaly map")
                 anomaly_map, _ = cal_anomaly_map(multi_scale_features, multi_scale_reverse_features, image.shape[-1],
                                                  amap_mode='a')
+                LOGGER.debug("Applying gaussian filter")
                 for item in range(len(anomaly_map)):
                     anomaly_map[item] = gaussian_filter(anomaly_map[item], sigma=4)
 
+                LOGGER.debug("Extending predictions")
                 labels_prediction.extend(np.max(anomaly_map.reshape(anomaly_map.shape[0], -1), axis=1))
                 masks_prediction.extend(anomaly_map.tolist())
 
+                LOGGER.debug("Computing PRO scores if needed")
                 if self.cfg.TEST.pixel_mode_verify:
                     if set(mask_current.astype(int).flatten()) == {0, 1}:
                         aupro_list.extend(compute_pro(anomaly_map, mask_current.astype(int), label_current))
+                LOGGER.debug(f"Finished processing batch {batch_idx}")
 
             auroc_samples = round(roc_auc_score(labels_gt, labels_prediction), 3)
             if self.cfg.TEST.pixel_mode_verify:

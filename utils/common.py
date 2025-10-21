@@ -225,10 +225,12 @@ def save_image(cfg, segmentations: ndarray, masks_gt, ima_path, ima_name_list, i
                                                                               mask_random_sample,
                                                                               ima_path_random_sample,
                                                                               ima_name_random_sample)):
-        anomaly_type = name_each.split("/")[2]
+        # Fixed: Use os.path.sep for cross-platform compatibility
+        anomaly_type = name_each.split(os.path.sep)[2] if os.path.sep in name_each else name_each.split("/")[2]
         temp_anomaly_name = os.path.join(temp_individual_name, anomaly_type)
         os.makedirs(temp_anomaly_name, exist_ok=True)
-        file_name = name_each.replace("/", "_").split(".")[0]
+        # Fixed: Use os.path.sep for cross-platform compatibility
+        file_name = name_each.replace(os.path.sep, "_").replace("/", "_").split(".")[0]
 
         mask_numpy = np.squeeze((255 * np.stack(mask_each)).astype(np.uint8))
 
@@ -290,10 +292,12 @@ def save_video_segmentations(cfg, segmentations: ndarray, scores: ndarray, ima_p
                                                               scores,
                                                               ima_path_random_sample,
                                                               ima_name_random_sample):
-        anomaly_type = name_each.split("/")[1]
+        # Fixed: Use os.path.sep for cross-platform compatibility
+        anomaly_type = name_each.split(os.path.sep)[1] if os.path.sep in name_each else name_each.split("/")[1]
         temp_anomaly_name = os.path.join(temp_individual_name, anomaly_type)
         os.makedirs(temp_anomaly_name, exist_ok=True)
-        file_name = name_each.replace("/", "_").split(".")[0]
+        # Fixed: Use os.path.sep for cross-platform compatibility
+        file_name = name_each.replace(os.path.sep, "_").replace("/", "_").split(".")[0]
 
         original_ima = individual_dataloader.dataset.transform_mask(default_loader(ori_path_each))
         original_ima = (original_ima.numpy() * 255).astype(np.uint8).transpose(1, 2, 0)

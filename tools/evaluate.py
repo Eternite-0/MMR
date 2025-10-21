@@ -45,12 +45,22 @@ def main():
 
         # 3. Build the model architecture
         LOGGER.info("Building model architecture...")
-        cur_device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        # Improved device handling
+        if torch.cuda.is_available() and args.device != "-1":
+            cur_device = torch.device("cuda:0")
+            LOGGER.info("Using GPU for evaluation")
+        else:
+            cur_device = torch.device("cpu")
+            LOGGER.info("Using CPU for evaluation")
 
         cur_model = load_backbones(cfg.TRAIN.backbone)
         mmr_base = MMR_base(cfg=cfg,
                             scale_factors=cfg.TRAIN.MMR.scale_factors,
                             FPN_output_dim=cfg.TRAIN.MMR.FPN_output_dim)
+
+        # Move models to device
+        cur_model = cur_model.to(cur_device)
+        mmr_base = mmr_base.to(cur_device)
 
         # 4. Load the trained model weights
         model_path = os.path.join(cfg.OUTPUT_DIR, "checkpoints", "mmr_model_final.pth")
@@ -61,7 +71,24 @@ def main():
             return
 
         LOGGER.info(f"Loading trained weights from: {model_path}")
-        mmr_base.load_state_dict(torch.load(model_path))
+        # Fixed: Add weights_only=True to address security warning
+        try:
+            checkpoint = torch.load(model_path, map_location=cur_device, weights_only=True)
+            mmr_base.load_state_dict(checkpoint)
+        except Exception as e:
+            LOGGER.error(f"Failed to load model checkpoint: {e}")
+            # Fallback for older PyTorch versions that don't support weights_only
+            try:
+                checkpoint = torch.load(model_path, map_location=cur_device)
+                mmr_base.load_state_dict(checkpoint)
+                LOGGER.warning("Loaded model without weights_only=True due to compatibility issues")
+            except Exception as e2:
+                LOGGER.error(f"Failed to load model even without weights_only: {e2}")
+                return
+        
+        # Fixed: Set model to evaluation mode
+        mmr_base.eval()
+        cur_model.eval()
 
         # 5. Run evaluation
         LOGGER.info("Starting evaluation...")
@@ -74,12 +101,16 @@ def main():
                                      device=cur_device,
                                      cfg=cfg)
 
-        auc_sample, auroc_pixel, pro_auc = MMR_instance.evaluation(test_dataloader=test_dataloader)
+        try:
+            auc_sample, auroc_pixel, pro_auc = MMR_instance.evaluation(test_dataloader=test_dataloader)
 
-        LOGGER.info("--- Evaluation Complete ---")
-        LOGGER.info(f"{test_dataloader.name}'s Image-Level AUROC is {auc_sample * 100:.2f}%.")
-        LOGGER.info(f"{test_dataloader.name}'s Pixel-Level AUROC is {auroc_pixel * 100:.2f}%.")
-        LOGGER.info(f"{test_dataloader.name}'s PRO Score is {pro_auc * 100:.2f}%.")
+            LOGGER.info("--- Evaluation Complete ---")
+            LOGGER.info(f"{test_dataloader.name}'s Image-Level AUROC is {auc_sample * 100:.2f}%.")
+            LOGGER.info(f"{test_dataloader.name}'s Pixel-Level AUROC is {auroc_pixel * 100:.2f}%.")
+            LOGGER.info(f"{test_dataloader.name}'s PRO Score is {pro_auc * 100:.2f}%.")
+        except Exception as e:
+            LOGGER.error(f"Error during evaluation: {e}")
+            raise
 
 
 if __name__ == '__main__':

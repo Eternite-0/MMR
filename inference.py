@@ -145,7 +145,7 @@ class MMR_Detector:
         print(f"Found {len(image_paths)} images in {folder_path}")
         return self.batch_detect(image_paths, threshold)
 
-    def save_visualization(self, original_pil_image, anomaly_map, image_path, decision):
+    def save_visualization(self,original_pil_image, anomaly_map, image_path, decision):
         # --- Start: Code Modification for High-Resolution Output ---
 
         # 1. Get the original image's dimensions
