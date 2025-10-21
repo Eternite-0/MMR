@@ -1,10 +1,10 @@
-## Industrial Anomaly Detection with Domain Shift: A Real-world Dataset and Masked Multi-scale Reconstruction
+## 工业异常检测与领域偏移：一个真实世界的数据集和掩码多尺度重建
 
 <p align="center">
   <img src=assets/image/mmr.png width="30%">
 </p>
 
-This is an official PyTorch implementation of the paper [Industrial Anomaly Detection with Domain Shift: A Real-world Dataset and Masked Multi-scale Reconstruction](https://arxiv.org/abs/2304.02216).
+这是论文《Industrial Anomaly Detection with Domain Shift: A Real-world Dataset and Masked Multi-scale Reconstruction》(工业异常检测与领域偏移：一个真实世界的数据集和掩码多尺度重建)的官方 PyTorch 实现。
 ```
 @article{zhang2023industrial,
   title={Industrial Anomaly Detection with Domain Shift: A Real-world Dataset and Masked Multi-scale Reconstruction},
@@ -14,11 +14,11 @@ This is an official PyTorch implementation of the paper [Industrial Anomaly Dete
 }
 ```
 
-### Datasets
+### 数据集
 
-We release a real-world Aero-engine Blade Anomaly Detection (AeBAD) dataset, consisting of two sub-datasets: the single-blade dataset (AeBAD-S) and the video anomaly detection dataset of blades (AeBAD-V). Compared to existing datasets, AeBAD has the following two characteristics: 1.) The target samples are not aligned and at different sacles. 2.) There is a domain shift between the distribution of normal samples in the test set and the training set, where the domain shifts are mainly caused by the changes in illumination and view.
+我们发布了一个真实世界的航空发动机叶片异常检测 (AeBAD) 数据集，由两个子数据集组成：单叶片数据集 (AeBAD-S) 和叶片视频异常检测数据集 (AeBAD-V)。与现有数据集相比，AeBAD 具有以下两个特征：1.) 目标样本未对齐且处于不同尺度。2.) 测试集中正常样本的分布与训练集之间存在领域偏移，其中领域偏移主要由光照和视角的变化引起。
 
-**Download dataset at [here](https://drive.google.com/file/d/14wkZAFFeudlg0NMFLsiGwS0E593b-lNo/view?usp=share_link) (Google Drive) or [here](https://cloud.189.cn/web/share?code=nYraE3uMRJn2) (access code: g4pr) (Tian Yi Yun Pan).**
+**在以下位置下载数据集：[Google Drive](https://drive.google.com/file/d/14wkZAFFeudlg0NMFLsiGwS0E593b-lNo/view?usp=share_link) 或 [天翼云盘](https://cloud.189.cn/web/share?code=nYraE3uMRJn2) (访问代码: g4pr)。**
 
 * AeBAD-S
 
@@ -32,11 +32,11 @@ We release a real-world Aero-engine Blade Anomaly Detection (AeBAD) dataset, con
   <img src=assets/image/dataset_v.jpg width="60%">
 </p>
 
-### Visualization for Videos
+### 视频可视化
 
-①: Original Video ②: PatchCore ③: ReverseDistillation ④: DRAEM ⑤: NSA ⑥: MMR
+①: 原始视频 ②: PatchCore ③: ReverseDistillation ④: DRAEM ⑤: NSA ⑥: MMR
 
-* video 1
+* 视频 1
 
 <table rules="none" align="center">
 	<tr>
@@ -85,7 +85,7 @@ We release a real-world Aero-engine Blade Anomaly Detection (AeBAD) dataset, con
 	</tr>
 </table>
 
-* Video 2
+* 视频 2
 
 <table rules="none" align="center">
 	<tr>
@@ -134,7 +134,7 @@ We release a real-world Aero-engine Blade Anomaly Detection (AeBAD) dataset, con
 	</tr>
 </table>
 
-* Video 3
+* 视频 3
 
 <table rules="none" align="center">
 	<tr>
@@ -183,17 +183,17 @@ We release a real-world Aero-engine Blade Anomaly Detection (AeBAD) dataset, con
 	</tr>
 </table>
 
-### Get Started
+### 开始使用
 
-#### Pre-trained models
+#### 预训练模型
 
-Download the pre-trained model of MAE (ViT-base) at [here](https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_base.pth).
+在以下位置下载 MAE (ViT-base) 的预训练模型：[here](https://dl.fbaipublicfiles.com/mae/visualize/mae_visualize_vit_base.pth)。
 
-#### Dataset
+#### 数据集
 
 **MVTec:**
 
-**Create the MVTec dataset directory**. Download the MVTec-AD dataset from [here](https://www.mvtec.com/company/research/datasets/mvtec-ad). The MVTec dataset directory should be as follows. 
+**创建 MVTec 数据集目录**。从以下位置下载 MVTec-AD 数据集：[here](https://www.mvtec.com/company/research/datasets/mvtec-ad)。MVTec 数据集目录应如下所示：
 
 ```
 |-- data
@@ -207,7 +207,7 @@ Download the pre-trained model of MAE (ViT-base) at [here](https://dl.fbaipublic
 
 **AeBAD:**
 
-Download the AeBAD dataset from the above link. The AeBAD dataset directory should be as follows.
+从上述链接下载 AeBAD 数据集。AeBAD 数据集目录应如下所示：
 
 ```
 |-- AeBAD
@@ -230,20 +230,20 @@ Download the AeBAD dataset from the above link. The AeBAD dataset directory shou
                 |-- video1_train
 ```
 
-**Note that background, view and illumination in the train set is different from test. The background, view and illumination in test is unseen for the training set.**
+**请注意，训练集中的背景、视角和光照与测试集不同。测试集中的背景、视角和光照对于训练集来说是不可见的。**
 
-#### Virtual Environment
+#### 虚拟环境
 
-Use the following commands:
+使用以下命令：
 ```
 pip install -r requirements.txt
 ```
 
-#### Train and Test for MVTec, AeBAD
+#### MVTec 和 AeBAD 的训练与测试
 
-Train the model and evaluate it for each category or different domains. This will output the results (sample-level AUROC, pixel-level AUROC and PRO) for each category. It will generate the visualization in the directory.
+为每个类别或不同领域训练模型并进行评估。这将输出每个类别的结果（样本级 AUROC、像素级 AUROC 和 PRO）。它将在目录中生成可视化结果。
 
-run the following code:
+运行以下代码：
 
 ```
 sh mvtec_run.sh
@@ -257,32 +257,30 @@ sh AeBAD_S_run.sh
 sh AeBAD_V_run.sh
 ```
 
-TRAIN.MMR.model_chkpt in MMR.yaml is the path of above download model. TRAIN.dataset_path (TEST.dataset_path) is the path of data.
-Set Test.save_segmentation_images as True or False to save processed image.
+MMR.yaml 中的 TRAIN.MMR.model_chkpt 是上述下载模型的路径。TRAIN.dataset_path (TEST.dataset_path) 是数据的路径。
+将 Test.save_segmentation_images 设置为 True 或 False 以保存处理后的图像。
 
-**Note that for AeBAD-V, we only evaluate the sample-level metric. The pixel-level metric is 0.**
+**请注意，对于 AeBAD-V，我们仅评估样本级指标。像素级指标为 0。**
 
-#### GUI for Industrial Applications
+#### 工业应用的图形用户界面
 
-For industrial applications, we provide a PyQt-based graphical user interface for easier use:
+为了工业应用，我们提供了一个基于 PyQt 的图形用户界面以便于使用：
 
 ```
 python gui_main.py
 ```
 
-The GUI allows you to:
-- Load trained models and configuration files
-- Perform single image anomaly detection
-- Process batches of images in a folder
-- Visualize detection results with heatmaps
-- Adjust detection thresholds
+该 GUI 允许您：
+- 加载训练好的模型和配置文件
+- 执行单张图像异常检测
+- 处理文件夹中的批量图像
+- 使用热图可视化检测结果
+- 调整检测阈值
 
-The interface is designed for industrial environments and provides a user-friendly way to perform anomaly detection without command-line interactions.
+该界面专为工业环境设计，提供了一种用户友好的方式来执行异常检测，无需命令行交互。
 
-## Acknowledgement
-We acknowledge the excellent implementation from [MAE](https://github.com/facebookresearch/mae), [ViTDet](https://github.com/facebookresearch/detectron2/tree/main/projects/ViTDet).
+## 致谢
+我们感谢来自 [MAE](https://github.com/facebookresearch/mae) 和 [ViTDet](https://github.com/facebookresearch/detectron2/tree/main/projects/ViTDet) 的优秀实现。
 
-## License
-The data is released under the CC BY 4.0 license.
-
-
+## 许可证
+数据以 CC BY 4.0 许可证发布。
