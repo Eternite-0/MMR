@@ -4,7 +4,7 @@
   <img src=assets/image/mmr.png width="30%">
 </p>
 
-这是论文《Industrial Anomaly Detection with Domain Shift: A Real-world Dataset and Masked Multi-scale Reconstruction》(工业异常检测与领域偏移：一个真实世界的数据集和掩码多尺度重建)的官方 PyTorch 实现。
+这是论文《[Industrial Anomaly Detection with Domain Shift: A Real-world Dataset and Masked Multi-scale Reconstruction](https://arxiv.org/abs/2304.02216)》(工业异常检测与领域偏移：一个真实世界的数据集和掩码多尺度重建)的官方 PyTorch 实现。
 ```
 @article{zhang2023industrial,
   title={Industrial Anomaly Detection with Domain Shift: A Real-world Dataset and Masked Multi-scale Reconstruction},
